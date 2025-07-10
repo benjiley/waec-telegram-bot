@@ -36,47 +36,5 @@ Lecture command
 
 My Info
 
-@bot.message_handler(func=lambda m: m.text == "📄 My Info") def my_info(message): chat_id = message.chat.id data = user_data.get(chat_id) if data and "name" in data: name = data.get("name", "") class_ = data.get("class", "") subjects = data.get("subjects", "") bot.send_message(chat_id, f"👤 Name: {name}\n🏫 Class: {class_}\n📚 Subjects: {subjects}") else: bot.send_message(chat_id, "You're not registered yet. Tap 📝 Register.")
-
-General text handler
-
-@bot.message_handler(func=lambda m: True) def text_handler(message): chat_id = message.chat.id text = message.text.strip().lower()
-
-# Handle quiz answer
-if chat_id in quiz_state:
-    correct = quiz_state[chat_id]['answer']
-    if text == correct:
-        bot.send_message(chat_id, "✅ Correct!")
-    elif text in ['a', 'b', 'c', 'd']:
-        bot.send_message(chat_id, f"❌ Wrong! Correct answer: {correct.upper()}")
-    else:
-        bot.send_message(chat_id, "Please reply with a/b/c/d")
-    del quiz_state[chat_id]
-    return
-
-# Handle registration
-if chat_id in user_data:
-    step = user_data[chat_id].get("step")
-
-    if step == "name":
-        user_data[chat_id]["name"] = message.text
-        user_data[chat_id]["step"] = "class"
-        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
-        markup.add("SS1", "SS2", "SS3")
-        bot.send_message(chat_id, "Select your class:", reply_markup=markup)
-
-    elif step == "class":
-        user_data[chat_id]["class"] = message.text
-        user_data[chat_id]["step"] = "subjects"
-        bot.send_message(chat_id, "Enter your subjects (comma-separated):")
-
-    elif step == "subjects":
-        user_data[chat_id]["subjects"] = message.text
-        user_data[chat_id]["step"] = "done"
-        bot.send_message(chat_id, "✅ Registration complete!")
-        main_menu(chat_id)
-
-Start polling
-
-bot.polling()
+@bot.message_handler(func=lambda m: m.text == "📄 My Info") def my_info(message): chat_id = message.chat.id data = user_data.get(chat_id) if data and "name" in data: name = data.get("name", "
 
