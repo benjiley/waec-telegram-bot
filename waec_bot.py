@@ -3,7 +3,7 @@ from telebot import types
 import csv
 import os
 
-bot = telebot.TeleBot("PASTE_YOUR_TOKEN_HERE")
+bot = telebot.TeleBot("8092089557:AAFU69n7rcDEuSb92_rwb_OBJAbIJlf6roo")
 
 user_data = {}
 
