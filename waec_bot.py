@@ -1,6 +1,6 @@
 import telebot from telebot import types import random
 
-bot = telebot.TeleBot("8092089557:AAFU69n7rcDEuSb92_rwb_OBJAbIJlf6roo")
+bot = telebot.TeleBot("PASTE_YOUR_BOT_TOKEN")
 
 Store user info and quiz state
 
@@ -18,7 +18,7 @@ Start command with menu
 
 def main_menu(chat_id): markup = types.ReplyKeyboardMarkup(resize_keyboard=True) markup.row("📝 Register", "📚 Take Quiz") markup.row("🎓 Take Lecture", "📄 My Info") bot.send_message(chat_id, "Choose an option:", reply_markup=markup)
 
-@bot.message_handler(commands=['start']) def start(message): chat_id = message.chat.id main_menu(chat_id) bot.send_message(chat_id, "\ud83d\udc4b Welcome to WAEC Tutorial Bot!")
+@bot.message_handler(commands=['start']) def start(message): chat_id = message.chat.id bot.send_message(chat_id, "\ud83d\udc4b Welcome to WAEC Tutorial Bot!") main_menu(chat_id)
 
 Registration flow
 
@@ -36,5 +36,52 @@ Lecture command
 
 My Info
 
-@bot.message_handler(func=lambda m: m.text == "📄 My Info") def my_info(message): chat_id = message.chat.id data = user_data.get(chat_id) if data and "name" in data: name = data.get("name", "
+@bot.message_handler(func=lambda m: m.text == "📄 My Info") def my_info(message): chat_id = message.chat.id data = user_data.get(chat_id) if data and "name" in data: name = data.get("name", "") class_ = data.get("class", "") subjects = data.get("subjects", "") bot.send_message(chat_id, f"👤 Name: {name}\n🏫 Class: {class_}\n📚 Subjects: {subjects}") else: bot.send_message(chat_id, "You're not registered yet. Tap 📝 Register.")
+
+General text handler
+
+@bot.message_handler(func=lambda m: True) def text_handler(message): chat_id = message.chat.id text = message.text.strip()
+
+# Handle quiz answer
+if chat_id in quiz_state:
+    correct = quiz_state[chat_id]['answer']
+    if text.lower() == correct:
+        bot.send_message(chat_id, "✅ Correct!")
+    elif text.lower() in ['a', 'b', 'c', 'd']:
+        bot.send_message(chat_id, f"❌ Wrong! Correct answer: {correct.upper()}")
+    else:
+        bot.send_message(chat_id, "Please reply with a/b/c/d")
+    del quiz_state[chat_id]
+    main_menu(chat_id)
+    return
+
+# Handle registration
+if chat_id in user_data:
+    step = user_data[chat_id].get("step")
+
+    if step == "name":
+        user_data[chat_id]["name"] = text
+        user_data[chat_id]["step"] = "class"
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+        markup.add("SS1", "SS2", "SS3")
+        bot.send_message(chat_id, "Select your class:", reply_markup=markup)
+
+    elif step == "class":
+        user_data[chat_id]["class"] = text
+        user_data[chat_id]["step"] = "subjects"
+        bot.send_message(chat_id, "Enter your subjects (comma-separated):")
+
+    elif step == "subjects":
+        user_data[chat_id]["subjects"] = text
+        user_data[chat_id]["step"] = "done"
+        bot.send_message(chat_id, "✅ Registration complete!")
+        main_menu(chat_id)
+    return
+
+# If nothing matched, just show menu again
+main_menu(chat_id)
+
+Start polling
+
+bot.polling()
 
