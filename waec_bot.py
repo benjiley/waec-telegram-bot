@@ -1,6 +1,6 @@
 import telebot from telebot import types import random
 
-bot = telebot.TeleBot("PASTE_YOUR_BOT_TOKEN")
+bot = telebot.TeleBot("8092089557:AAFU69n7rcDEuSb92_rwb_OBJAbIJlf6roo")
 
 Store user info and quiz state
 
